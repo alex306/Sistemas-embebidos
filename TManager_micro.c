@@ -211,10 +211,10 @@ task* insertion_sort(task* head)
 
 void activateTask(char id)
 { 
-	task* new = search(head_iddle, id);
 	if (taskRunning != NULL)
 	{
-		taskRunning->return_addr = __get_LR(); 
+		taskRunning->return_addr = __get_LR();
+		task* new = search(head_iddle, id);
 		task* aux = new;
 		head_iddle = remove_any(head_iddle, new); // aqui copia C con todo y next (C->A) y la lista iddle (B->C->A)
 		head_ready = prepend2(aux, head_ready, 1);
@@ -227,6 +227,7 @@ void activateTask(char id)
 		}
 	}
 	else{
+		task* new = search(head_iddle, id);
 		task* aux = new;
 		head_iddle = remove_any(head_iddle, new); // aqui copia C con todo y next (C->A) y la lista iddle (B->C->A)
 		head_ready = prepend2(aux, head_ready, 1);
@@ -241,9 +242,13 @@ void terminateTask(){
 		head_iddle = prepend2(taskRunning, head_iddle, 0);
 		taskRunning = NULL;
 	}else{
-		if(head_wait != NULL){
-			run_wait(head_wait); // transition from wait to run
-
+		if(head_ready != NULL){
+			taskRunning = head_ready;
+			head_ready = remove_any(head_ready, head_ready);
+			taskRunning->state = 0;
+			head_iddle = prepend2(taskRunning, head_iddle, 0);
+			taskRunning = NULL;
+			
 		}
 	}
 }
